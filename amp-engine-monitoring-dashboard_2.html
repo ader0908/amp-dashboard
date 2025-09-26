@@ -6,9 +6,21 @@
     <title>AMP 모니터링 대시보드</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
     
     <!-- 실제 최고값 표시 플러그인 -->
     <script>
+        // Chart.js 로드 확인
+        console.log('Chart.js 로드됨:', typeof Chart !== 'undefined');
+        
+        // Chart.js annotation 플러그인 등록
+        if (typeof ChartAnnotation !== 'undefined') {
+            Chart.register(ChartAnnotation);
+            console.log('Chart.js annotation 플러그인 등록됨');
+        } else {
+            console.log('Chart.js annotation 플러그인을 찾을 수 없음');
+        }
+        
         Chart.register({
             id: 'maxValueDisplay',
             afterDraw: function(chart) {
@@ -1242,8 +1254,173 @@
         .chart-header-controls {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
             flex-shrink: 0;
+        }
+
+        /* 새로운 차트 액션 버튼 스타일 */
+        .chart-action-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 0.875rem;
+        }
+
+        .chart-action-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #475569;
+            transform: translateY(-1px);
+        }
+
+        .period-query-btn {
+            background: #10b981;
+            border-color: #059669;
+            color: white;
+        }
+
+        .period-query-btn:hover {
+            background: #059669;
+            border-color: #047857;
+            color: white;
+        }
+
+        .chart-settings-btn {
+            background: #3b82f6;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .chart-settings-btn:hover {
+            background: #2563eb;
+            border-color: #1d4ed8;
+            color: white;
+        }
+
+        /* 기간조회 모달 스타일 */
+        .global-settings-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .global-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .global-checkmark {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #6b7280;
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        .global-checkbox-label input[type="checkbox"] {
+            display: none;
+        }
+
+        .global-checkbox-label input[type="checkbox"]:checked + .global-checkmark {
+            background: #3b82f6;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .global-checkbox-label input[type="checkbox"]:checked + .global-checkmark::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .individual-period-settings {
+            margin-top: 1rem;
+        }
+
+        .individual-period-settings .query-panel {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 기간조회 모달 넓이 조정 */
+        #periodQueryModal .modal-content {
+            max-width: 600px;
+            width: 80%;
+            max-height: fit-content;
+            margin: 2% auto;
+        }
+
+        /* 조회 패널 내부 요소들이 1줄로 표시되도록 */
+        .individual-period-settings .query-panel .query-mode {
+            flex-wrap: nowrap;
+            gap: 0.5rem;
+        }
+
+        .individual-period-settings .query-panel .datetime-inputs {
+            flex-shrink: 0;
+        }
+
+        .individual-period-settings .query-panel .duration-badge {
+            min-width: 120px;
+        }
+
+        .individual-period-settings .query-panel .interval-select {
+            min-width: 80px;
+        }
+
+        /* 조회 패널 텍스트 크기 증가 */
+        .individual-period-settings .query-panel {
+            font-size: 14px;
+        }
+
+        .individual-period-settings .query-panel label {
+            font-size: 14px !important;
+            font-weight: 600;
+        }
+
+        .individual-period-settings .query-panel select {
+            font-size: 14px !important;
+            padding: 8px 12px;
+        }
+
+        .individual-period-settings .query-panel input[type="text"],
+        .individual-period-settings .query-panel input[type="datetime-local"] {
+            font-size: 14px !important;
+            padding: 8px 12px;
+        }
+
+        .individual-period-settings .query-panel .radio-label {
+            font-size: 14px !important;
+        }
+
+        .individual-period-settings .query-panel .btn {
+            font-size: 14px !important;
+            padding: 8px 16px;
         }
 
         .chart-title {
@@ -1478,13 +1655,370 @@
 
         .settings-modal-content {
             background: var(--bg-primary);
-            margin: 5% auto;
+            margin: 3% auto;
             padding: 1.5rem;
             border-radius: 8px;
             width: 80%;
             max-width: 600px;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
+        }
+
+        /* 차트 설정 모달 기본 스타일 */
+        .chart-settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        .settings-modal-content {
+            background: white;
+            margin: 1% auto;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            height: 98vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            margin: 0;
+            color: #495057;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0.5rem 0 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .modal-close:hover {
+            color: #495057;
+        }
+
+        /* 미리보기 섹션 */
+        .preview-section {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .preview-section h4 {
+            margin: 0 0 0.5rem 0;
+            color: #495057;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .preview-chart-container {
+            background: white;
+            border-radius: 4px;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+        }
+
+        /* 설정 그룹 */
+        .setting-group {
+            margin-bottom: 0.15rem;
+            padding: 0.15rem 0.25rem;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+        }
+
+        .setting-group h4 {
+            margin: 0 0 0.05rem 0;
+            color: #495057;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .setting-description {
+            margin: 0.02rem 0 0 0;
+            color: #6c757d;
+            font-size: 0.7rem;
+        }
+
+        /* 라디오 그룹 */
+        .radio-group {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.15rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            color: #495057;
+        }
+
+        .radio-label i {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .radio-mark {
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid #6c757d;
+            border-radius: 50%;
+            position: relative;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .radio-label input[type="radio"] {
+            display: none;
+        }
+
+        .radio-label input[type="radio"]:checked + .radio-mark {
+            border-color: #007bff;
+            background: #007bff;
+        }
+
+        .radio-label input[type="radio"]:checked + .radio-mark::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .radio-label input[type="radio"]:checked ~ i {
+            color: #007bff;
+        }
+
+        /* 토글 스위치 */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .toggle-with-description {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        
+
+        .toggle-label {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 10px;
+            width: 10px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-label input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-label input:checked + .toggle-slider {
+            background-color: #007bff;
+        }
+
+        .toggle-label input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+
+        .toggle-text {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* Y축 고정 입력 */
+        .y-axis-fixed-input {
+            margin-top: 0.25rem;
+            padding: 0.2rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .y-axis-fixed-input label {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: #495057;
+        }
+
+        .y-axis-fixed-input input {
+            width: 60px;
+            padding: 0.2rem 0.4rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        /* 임계치 아이템 */
+        .threshold-item {
+            margin-bottom: 0.15rem;
+            padding: 0.15rem;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .threshold-item .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.7rem;
+            color: #495057;
+            cursor: pointer;
+            flex-wrap: wrap;
+        }
+        
+        .threshold-description {
+            font-size: 0.6rem;
+            color: #6c757d;
+            margin-left: 0.5rem;
+        }
+
+        .threshold-item .checkmark {
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid #6c757d;
+            border-radius: 2px;
+            position: relative;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .threshold-item input[type="checkbox"] {
+            display: none;
+        }
+
+        .threshold-item input[type="checkbox"]:checked + .checkmark {
+            background: #007bff;
+            border-color: #007bff;
+        }
+
+        .threshold-item input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .threshold-item input[type="number"] {
+            width: 40px;
+            padding: 0.15rem 0.3rem;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            margin: 0 0.15rem;
+        }
+
+        /* 푸터 */
+        .settings-footer {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 0.5rem 1rem 0.5rem 1rem;
+            padding: 0.5rem 0;
+            border-top: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #007bff;
+            border: 1px solid #007bff;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
         }
 
         .settings-content {
@@ -4160,7 +4694,137 @@
                 <button class="modal-close" onclick="closeChartSettings()">&times;</button>
             </div>
             <div class="settings-content" id="chartSettingsContent">
-                <!-- 동적으로 생성됩니다 -->
+                <!-- 미리보기 차트 -->
+                <div class="preview-section">
+                    <h4>미리보기</h4>
+                    <div class="preview-chart-container">
+                        <canvas id="previewChart" width="400" height="150"></canvas>
+                    </div>
+                </div>
+
+                <!-- 차트 유형 설정 -->
+                <div class="setting-group">
+                    <h4>차트 유형</h4>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="chartType" value="line" onchange="updatePreviewChart()">
+                            <span class="radio-mark"></span>
+                            <i class="fas fa-chart-line"></i>
+                            선차트
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="chartType" value="bar" onchange="updatePreviewChart()">
+                            <span class="radio-mark"></span>
+                            <i class="fas fa-chart-bar"></i>
+                            막대차트
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="chartType" value="area" checked onchange="updatePreviewChart()">
+                            <span class="radio-mark"></span>
+                            <i class="fas fa-chart-area"></i>
+                            영역차트
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 이전 시간과 비교 -->
+                <div class="setting-group">
+                    <h4>이전 시간과 비교</h4>
+                    <div class="toggle-switch">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="comparePrevious" onchange="updatePreviewChart()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-text" id="compareText">OFF</span>
+                    </div>
+                </div>
+
+                <!-- Y축 최대값 설정 -->
+                <div class="setting-group">
+                    <h4>Y축 최대값</h4>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="yAxisMax" value="auto" checked onchange="toggleYAxisFixed(); updatePreviewChart();">
+                            <span class="radio-mark"></span>
+                            자동
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="yAxisMax" value="fixed" onchange="toggleYAxisFixed(); updatePreviewChart();">
+                            <span class="radio-mark"></span>
+                            고정
+                        </label>
+                    </div>
+                    <div class="y-axis-fixed-input" id="yAxisFixedInput" style="display: none;">
+                        <label>최대값: <input type="number" id="yAxisMaxValue" value="100" onchange="updatePreviewChart()"></label>
+                    </div>
+                </div>
+
+                <!-- 최대값 표시 -->
+                <div class="setting-group">
+                    <h4>최대값 표시</h4>
+                    <div class="toggle-switch">
+                        <div class="toggle-with-description">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="showMaxValue" checked onchange="updatePreviewChart()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-text" id="maxValueText">ON</span>
+                            <span class="threshold-description">차트에서 MAX 값을 가진 서버의 값을 차트위에 표시함</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 범례 표시 -->
+                <div class="setting-group">
+                    <h4>범례 표시</h4>
+                    <div class="toggle-switch">
+                        <div class="toggle-with-description">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="showLegend" checked onchange="updatePreviewChart()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-text" id="legendText">ON</span>
+                            <span class="threshold-description">설정 시 차트내에 서버리스트를 표시해 줍니다.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 임계치 설정 -->
+                <div class="setting-group">
+                    <h4>임계치 설정</h4>
+                    
+                    <div class="threshold-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showMaxThreshold" checked onchange="updatePreviewChart()">
+                            <span class="checkmark"></span>
+                            Max: <input type="number" id="maxThresholdValue" value="90" onchange="updatePreviewChart()">% 표시
+                            <span class="threshold-description">빨간색 점선으로 표시됩니다.</span>
+                        </label>
+                    </div>
+                    
+                    <div class="threshold-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showAverageLine" checked onchange="updatePreviewChart()">
+                            <span class="checkmark"></span>
+                            평균선 표시
+                            <span class="threshold-description">초록색 점선으로 표시됩니다.</span>
+                        </label>
+                    </div>
+                    
+                    <div class="threshold-item">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="showMinThreshold" checked onchange="updatePreviewChart()">
+                            <span class="checkmark"></span>
+                            Min: <input type="number" id="minThresholdValue" value="10" onchange="updatePreviewChart()">% 표시
+                            <span class="threshold-description">노란색 점선으로 표시됩니다.</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-footer">
+                <button class="btn btn-secondary" id="cancelButton" onclick="closeChartSettings()">취소</button>
+                <button class="btn btn-primary" id="applyButton" onclick="applyChartSettings()">적용</button>
             </div>
         </div>
     </div>
@@ -5555,28 +6219,13 @@
                         </div>
                     </div>
                     <div class="chart-header-controls">
-                        <div class="chart-type-selector">
-                            <select class="chart-type-dropdown" id="chartType-${config.id}" onchange="changeChartType('${config.id}')">
-                                <option value="line">선차트</option>
-                                <option value="bar">막대차트</option>
-                                <option value="area">영역차트</option>
-                            </select>
-                    </div>
-                    <div class="chart-controls">
-                            <button class="chart-action-btn threshold-btn" onclick="openThresholdSettings('${config.id}')" title="임계치 설정">
-                                <i class="fas fa-chart-line"></i>
-                            </button>
-                            <button class="chart-action-btn query-btn" onclick="openQuerySettings('${config.id}')" title="조회설정">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <button class="chart-action-btn detail-btn" onclick="openDetailView('${config.id}')" title="상세보기">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                            <button class="chart-action-btn legend-btn" onclick="openLegendSettings('${config.id}')" title="범례">
-                                <i class="fas fa-list"></i>
+                        <button class="chart-action-btn period-query-btn" onclick="openPeriodQuery('${config.id}')" title="기간조회">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button class="chart-action-btn chart-settings-btn" onclick="openChartSettings('${config.id}')" title="차트설정">
+                            <i class="fas fa-cog"></i>
                         </button>
                     </div>
-                </div>
                         </div>
                 </div>
                 <div class="chart-container" id="chart-container-${config.id}">
@@ -6310,6 +6959,670 @@
 
             return totalCount > 0 ? totalSum / totalCount : 0;
         }
+
+        // 기간조회 모달 열기
+        function openPeriodQuery(chartId) {
+            window.currentPeriodChartId = chartId;
+            const modal = document.getElementById('periodQueryModal');
+            if (modal) {
+                modal.style.display = 'block';
+                loadPeriodSettings(chartId);
+            }
+        }
+
+        // 기간조회 모달 닫기
+        function closePeriodQueryModal() {
+            const modal = document.getElementById('periodQueryModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            window.currentPeriodChartId = null;
+        }
+
+        // 전체 설정을 따름 토글
+        function toggleIndividualPeriod() {
+            const followGlobal = document.getElementById('followGlobalSettings');
+            const individualSettings = document.getElementById('individualPeriodSettings');
+            
+            // 조회화면은 항상 보이고 활성화 상태로 유지
+            individualSettings.style.display = 'block';
+            
+            // 조회 화면의 모든 요소는 항상 활성화 상태 유지
+            const allInputs = individualSettings.querySelectorAll('input, select, button');
+            allInputs.forEach(input => {
+                input.disabled = false;
+                input.style.opacity = '1';
+            });
+            
+            // 전체 설정을 따름 체크박스는 단순히 UI 표시용으로만 사용
+            // 실제 기능적 연관성은 없음
+        }
+
+        // 기간조회 설정 로드
+        function loadPeriodSettings(chartId) {
+            // 차트별 설정 로드 (현재는 기본값으로 설정)
+            const followGlobal = document.getElementById('followGlobalSettings');
+            const individualSettings = document.getElementById('individualPeriodSettings');
+            
+            if (followGlobal && individualSettings) {
+                // 전체 설정을 따름은 기본적으로 체크 해제 상태
+                followGlobal.checked = false;
+                
+                // 조회 화면은 항상 보이고 활성화 상태로 유지
+                individualSettings.style.display = 'block';
+                
+                // 모든 입력 요소를 항상 활성화 상태로 유지
+                const inputs = individualSettings.querySelectorAll('input, select, button');
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    input.style.opacity = '1';
+                });
+            }
+        }
+
+        // 기간조회 설정 적용
+        function applyPeriodQuery() {
+            const chartId = window.currentPeriodChartId;
+            if (!chartId) {
+                showNotification('차트 정보를 찾을 수 없습니다.');
+                return;
+            }
+
+            // 기간조회 설정 적용 로직
+            console.log('기간조회 설정 적용:', chartId);
+            closePeriodQueryModal();
+            showNotification(`${chartId} 차트의 기간조회 설정이 적용되었습니다.`);
+        }
+
+        // 차트설정 모달 열기
+        function openChartSettings(chartId) {
+            console.log('openChartSettings 호출됨, chartId:', chartId);
+            
+            // 이미 모달이 열려있는지 확인
+            const modal = document.getElementById('chartSettingsModal');
+            if (modal && modal.style.display === 'block') {
+                console.log('모달이 이미 열려있습니다. 중복 호출 방지.');
+                return;
+            }
+            
+            window.currentChartSettingsId = chartId;
+            console.log('모달 요소:', modal);
+            
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '1000';
+                console.log('모달 표시됨');
+                initializePreviewChart();
+                
+                // 적용 버튼에 직접 이벤트 리스너 추가
+                const applyButton = modal.querySelector('#applyButton');
+                const cancelButton = modal.querySelector('#cancelButton');
+                
+                if (applyButton) {
+                    console.log('적용 버튼 찾음:', applyButton);
+                    
+                    // 기존 이벤트 리스너 모두 제거
+                    const newApplyButton = applyButton.cloneNode(true);
+                    applyButton.parentNode.replaceChild(newApplyButton, applyButton);
+                    
+                    // 새로운 이벤트 리스너 추가
+                    newApplyButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🚀🚀🚀🚀🚀 적용 버튼 클릭됨! 🚀🚀🚀🚀🚀');
+                        applyChartSettings();
+                        return false;
+                    });
+                    
+                    // onclick 속성도 추가
+                    newApplyButton.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🚀🚀🚀🚀🚀 적용 버튼 onclick! 🚀🚀🚀🚀🚀');
+                        applyChartSettings();
+                        return false;
+                    };
+                    
+                    console.log('적용 버튼 이벤트 리스너 등록 완료');
+                } else {
+                    console.error('적용 버튼을 찾을 수 없습니다!');
+                }
+                
+                if (cancelButton) {
+                    console.log('취소 버튼 찾음:', cancelButton);
+                    cancelButton.addEventListener('click', function() {
+                        console.log('🚀 취소 버튼 클릭됨!');
+                        closeChartSettings();
+                    });
+                } else {
+                    console.error('취소 버튼을 찾을 수 없습니다!');
+                }
+                
+                // 모달 외부 클릭으로 닫기 이벤트 추가
+                modal.onclick = function(event) {
+                    if (event.target === modal) {
+                        console.log('모달 외부 클릭으로 닫기');
+                        closeChartSettings();
+                    }
+                };
+                
+                // ESC 키로 닫기 이벤트 추가
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && modal.style.display === 'block') {
+                        console.log('ESC 키로 모달 닫기');
+                        closeChartSettings();
+                    }
+                });
+            } else {
+                console.error('차트설정 모달을 찾을 수 없습니다.');
+                alert('차트설정 기능을 준비 중입니다.');
+            }
+        }
+
+        // 차트 설정 모달 닫기
+        function closeChartSettings() {
+            console.log('closeChartSettings 호출됨');
+            const modal = document.getElementById('chartSettingsModal');
+            console.log('모달 요소:', modal);
+            
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('모달이 닫혔습니다.');
+            } else {
+                console.error('차트설정 모달을 찾을 수 없습니다.');
+            }
+        }
+
+        // 선차트 생성
+        function createLineChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue) {
+            const dataMaxValue = Math.max(...data1, ...data2);
+            const dataMinValue = Math.min(...data1, ...data2);
+            
+            // Y축 최대값 설정 적용
+            let maxValue, minValue;
+            if (yAxisMax === 'fixed' && yAxisMaxValue) {
+                maxValue = parseInt(yAxisMaxValue);
+                minValue = 0; // 고정값 사용 시 최소값은 0
+            } else {
+                maxValue = dataMaxValue;
+                minValue = Math.max(0, dataMinValue); // 최소값이 0보다 작으면 0으로 설정
+            }
+            
+            // 값 범위가 0이 되지 않도록 보장
+            if (maxValue === minValue) {
+                maxValue = minValue + 1;
+            }
+            
+            const valueRange = maxValue - minValue;
+            
+            let svg = '';
+            
+            // 격자 그리기 및 Y축 라벨
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight / 4) * i;
+                const value = maxValue - (valueRange / 4) * i;
+                svg += `<line x1="${padding}" y1="${y}" x2="${padding + chartWidth}" y2="${y}" stroke="#e9ecef" stroke-width="1"/>`;
+                svg += `<text x="${padding - 5}" y="${y + 4}" font-size="10" fill="#6c757d" text-anchor="end">${Math.round(value)}</text>`;
+            }
+            
+            // 데이터 포인트를 좌표로 변환
+            const points1 = data1.map((value, index) => {
+                const x = padding + (chartWidth / (data1.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                return `${x},${y}`;
+            }).join(' ');
+            
+            const points2 = data2.map((value, index) => {
+                const x = padding + (chartWidth / (data2.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                return `${x},${y}`;
+            }).join(' ');
+            
+            // 선 그리기
+            svg += `<polyline points="${points1}" fill="none" stroke="#007bff" stroke-width="2"/>`;
+            svg += `<polyline points="${points2}" fill="none" stroke="#28a745" stroke-width="2"/>`;
+            
+            // 데이터 포인트 그리기
+            data1.forEach((value, index) => {
+                const x = padding + (chartWidth / (data1.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                svg += `<circle cx="${x}" cy="${y}" r="3" fill="#007bff"/>`;
+            });
+            
+            data2.forEach((value, index) => {
+                const x = padding + (chartWidth / (data2.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                svg += `<circle cx="${x}" cy="${y}" r="3" fill="#28a745"/>`;
+            });
+            
+            // 이전 시간과 비교 (점선)
+            if (comparePrevious) {
+                const prevPoints1 = data1.map((value, index) => {
+                    const x = padding + (chartWidth / (data1.length - 1)) * index;
+                    const y = padding + chartHeight - ((value * 0.7 - minValue) / valueRange) * chartHeight;
+                    return `${x},${y}`;
+                }).join(' ');
+                
+                const prevPoints2 = data2.map((value, index) => {
+                    const x = padding + (chartWidth / (data2.length - 1)) * index;
+                    const y = padding + chartHeight - ((value * 0.7 - minValue) / valueRange) * chartHeight;
+                    return `${x},${y}`;
+                }).join(' ');
+                
+                svg += `<polyline points="${prevPoints1}" fill="none" stroke="#6c757d" stroke-width="2" stroke-dasharray="5,5"/>`;
+                svg += `<polyline points="${prevPoints2}" fill="none" stroke="#6c757d" stroke-width="2" stroke-dasharray="5,5"/>`;
+            }
+            
+            return svg;
+        }
+        
+        // 막대차트 생성
+        function createBarChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue) {
+            const dataMaxValue = Math.max(...data1, ...data2);
+            const dataMinValue = Math.min(...data1, ...data2);
+            
+            // Y축 최대값 설정 적용
+            let maxValue, minValue;
+            if (yAxisMax === 'fixed' && yAxisMaxValue) {
+                maxValue = parseInt(yAxisMaxValue);
+                minValue = 0;
+            } else {
+                maxValue = dataMaxValue;
+                minValue = Math.max(0, dataMinValue); // 최소값이 0보다 작으면 0으로 설정
+            }
+            
+            // 값 범위가 0이 되지 않도록 보장
+            if (maxValue === minValue) {
+                maxValue = minValue + 1;
+            }
+            
+            const valueRange = maxValue - minValue;
+            
+            let svg = '';
+            
+            // 격자 그리기 및 Y축 라벨
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight / 4) * i;
+                const value = maxValue - (valueRange / 4) * i;
+                svg += `<line x1="${padding}" y1="${y}" x2="${padding + chartWidth}" y2="${y}" stroke="#e9ecef" stroke-width="1"/>`;
+                svg += `<text x="${padding - 5}" y="${y + 4}" font-size="10" fill="#6c757d" text-anchor="end">${Math.round(value)}</text>`;
+            }
+            
+            const barWidth = chartWidth / (data1.length * 2.5);
+            const barSpacing = chartWidth / data1.length;
+            
+            // 막대 그리기
+            data1.forEach((value, index) => {
+                const x = padding + barSpacing * index + barSpacing * 0.1;
+                const height = Math.max(1, ((value - minValue) / valueRange) * chartHeight); // 최소 높이 1px 보장
+                const y = padding + chartHeight - height;
+                
+                svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${height}" fill="#007bff" opacity="0.8"/>`;
+            });
+            
+            data2.forEach((value, index) => {
+                const x = padding + barSpacing * index + barSpacing * 0.1 + barWidth + 2;
+                const height = Math.max(1, ((value - minValue) / valueRange) * chartHeight); // 최소 높이 1px 보장
+                const y = padding + chartHeight - height;
+                
+                svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${height}" fill="#28a745" opacity="0.8"/>`;
+            });
+            
+            // 이전 시간과 비교 (반투명 막대)
+            if (comparePrevious) {
+                data1.forEach((value, index) => {
+                    const x = padding + barSpacing * index + barSpacing * 0.1;
+                    const height = Math.max(1, ((value * 0.7 - minValue) / valueRange) * chartHeight); // 최소 높이 1px 보장
+                    const y = padding + chartHeight - height;
+                    
+                    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${height}" fill="#6c757d" opacity="0.3"/>`;
+                });
+                
+                data2.forEach((value, index) => {
+                    const x = padding + barSpacing * index + barSpacing * 0.1 + barWidth + 2;
+                    const height = Math.max(1, ((value * 0.7 - minValue) / valueRange) * chartHeight); // 최소 높이 1px 보장
+                    const y = padding + chartHeight - height;
+                    
+                    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${height}" fill="#6c757d" opacity="0.3"/>`;
+                });
+            }
+            
+            // 임계치 선 그리기
+            if (showMaxThreshold && maxThresholdValue) {
+                const thresholdY = padding + chartHeight - ((parseInt(maxThresholdValue) - minValue) / valueRange) * chartHeight;
+                svg += `<line x1="${padding}" y1="${thresholdY}" x2="${padding + chartWidth}" y2="${thresholdY}" stroke="#dc3545" stroke-width="2" stroke-dasharray="5,5" opacity="0.8"/>`;
+                svg += `<text x="${padding + chartWidth - 5}" y="${thresholdY - 5}" font-size="10" fill="#dc3545">MAX: ${maxThresholdValue}%</text>`;
+            }
+            
+            if (showMinThreshold && minThresholdValue) {
+                const thresholdY = padding + chartHeight - ((parseInt(minThresholdValue) - minValue) / valueRange) * chartHeight;
+                svg += `<line x1="${padding}" y1="${thresholdY}" x2="${padding + chartWidth}" y2="${thresholdY}" stroke="#ffc107" stroke-width="2" stroke-dasharray="5,5" opacity="0.8"/>`;
+                svg += `<text x="${padding + chartWidth - 5}" y="${thresholdY + 15}" font-size="10" fill="#ffc107">MIN: ${minThresholdValue}%</text>`;
+            }
+            
+            if (showAverageLine) {
+                const avgValue = (dataMaxValue + dataMinValue) / 2;
+                const avgY = padding + chartHeight - ((avgValue - minValue) / valueRange) * chartHeight;
+                svg += `<line x1="${padding}" y1="${avgY}" x2="${padding + chartWidth}" y2="${avgY}" stroke="#28a745" stroke-width="2" stroke-dasharray="3,3" opacity="0.8"/>`;
+                svg += `<text x="${padding + chartWidth - 5}" y="${avgY - 5}" font-size="10" fill="#28a745">AVG: ${Math.round(avgValue)}%</text>`;
+            }
+            
+            return svg;
+        }
+        
+        // 영역차트 생성
+        function createAreaChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue) {
+            const dataMaxValue = Math.max(...data1, ...data2);
+            const dataMinValue = Math.min(...data1, ...data2);
+            
+            // Y축 최대값 설정 적용
+            let maxValue, minValue;
+            if (yAxisMax === 'fixed' && yAxisMaxValue) {
+                maxValue = parseInt(yAxisMaxValue);
+                minValue = 0;
+            } else {
+                maxValue = dataMaxValue;
+                minValue = Math.max(0, dataMinValue); // 최소값이 0보다 작으면 0으로 설정
+            }
+            
+            // 값 범위가 0이 되지 않도록 보장
+            if (maxValue === minValue) {
+                maxValue = minValue + 1;
+            }
+            
+            const valueRange = maxValue - minValue;
+            
+            let svg = '';
+            
+            // 격자 그리기 및 Y축 라벨
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (chartHeight / 4) * i;
+                const value = maxValue - (valueRange / 4) * i;
+                svg += `<line x1="${padding}" y1="${y}" x2="${padding + chartWidth}" y2="${y}" stroke="#e9ecef" stroke-width="1"/>`;
+                svg += `<text x="${padding - 5}" y="${y + 4}" font-size="10" fill="#6c757d" text-anchor="end">${Math.round(value)}</text>`;
+            }
+            
+            // 영역1 그리기
+            const points1 = data1.map((value, index) => {
+                const x = padding + (chartWidth / (data1.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                return `${x},${y}`;
+            });
+            
+            const area1Path = `M ${points1[0]} L ${points1.slice(1).join(' L ')} L ${padding + chartWidth},${padding + chartHeight} L ${padding},${padding + chartHeight} Z`;
+            svg += `<path d="${area1Path}" fill="url(#gradient1)" stroke="#007bff" stroke-width="2"/>`;
+            
+            // 영역2 그리기
+            const points2 = data2.map((value, index) => {
+                const x = padding + (chartWidth / (data2.length - 1)) * index;
+                const y = padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+                return `${x},${y}`;
+            });
+            
+            const area2Path = `M ${points2[0]} L ${points2.slice(1).join(' L ')} L ${padding + chartWidth},${padding + chartHeight} L ${padding},${padding + chartHeight} Z`;
+            svg += `<path d="${area2Path}" fill="url(#gradient2)" stroke="#28a745" stroke-width="2"/>`;
+            
+            // 그라데이션 정의
+            svg = `<defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#007bff;stop-opacity:0.3" />
+                    <stop offset="100%" style="stop-color:#007bff;stop-opacity:0.1" />
+                </linearGradient>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#28a745;stop-opacity:0.3" />
+                    <stop offset="100%" style="stop-color:#28a745;stop-opacity:0.1" />
+                </linearGradient>
+            </defs>` + svg;
+            
+            // 이전 시간과 비교 (점선)
+            if (comparePrevious) {
+                const prevPoints1 = data1.map((value, index) => {
+                    const x = padding + (chartWidth / (data1.length - 1)) * index;
+                    const y = padding + chartHeight - ((value * 0.7 - minValue) / valueRange) * chartHeight;
+                    return `${x},${y}`;
+                }).join(' ');
+                
+                const prevPoints2 = data2.map((value, index) => {
+                    const x = padding + (chartWidth / (data2.length - 1)) * index;
+                    const y = padding + chartHeight - ((value * 0.7 - minValue) / valueRange) * chartHeight;
+                    return `${x},${y}`;
+                }).join(' ');
+                
+                svg += `<polyline points="${prevPoints1}" fill="none" stroke="#6c757d" stroke-width="2" stroke-dasharray="5,5"/>`;
+                svg += `<polyline points="${prevPoints2}" fill="none" stroke="#6c757d" stroke-width="2" stroke-dasharray="5,5"/>`;
+            }
+            
+            return svg;
+        }
+        
+        // 범례 생성
+        function createLegend(svgWidth, svgHeight) {
+            const legendX = svgWidth - 100;
+            const legendY = 20;
+            
+            return `
+                <g>
+                    <rect x="${legendX}" y="${legendY}" width="90" height="50" fill="white" stroke="#dee2e6" rx="4"/>
+                    <line x1="${legendX + 10}" y1="${legendY + 15}" x2="${legendX + 25}" y2="${legendY + 15}" stroke="#007bff" stroke-width="2"/>
+                    <text x="${legendX + 30}" y="${legendY + 20}" font-size="12" fill="#495057">서버 1</text>
+                    <line x1="${legendX + 10}" y1="${legendY + 35}" x2="${legendX + 25}" y2="${legendY + 35}" stroke="#28a745" stroke-width="2"/>
+                    <text x="${legendX + 30}" y="${legendY + 40}" font-size="12" fill="#495057">서버 2</text>
+                </g>
+            `;
+        }
+
+        // 미리보기 차트 초기화
+        function initializePreviewChart() {
+            console.log('initializePreviewChart 호출됨');
+            
+            // 미리보기 컨테이너 찾기
+            const container = document.querySelector('.preview-chart-container');
+            console.log('미리보기 컨테이너:', container);
+            
+            if (!container) {
+                console.error('미리보기 차트 컨테이너를 찾을 수 없습니다.');
+                return;
+            }
+
+            // SVG 기반 미리보기 초기화
+            container.innerHTML = `
+                <div style="width: 100%; height: 150px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                    <div style="font-size: 14px; color: #6c757d; margin-bottom: 10px;">미리보기 차트</div>
+                    <div style="font-size: 12px; color: #adb5bd;">설정을 변경하면 여기에 미리보기가 표시됩니다</div>
+                </div>
+            `;
+            
+            console.log('미리보기 차트 영역 초기화 완료');
+            
+            // 초기 미리보기 업데이트
+            updatePreviewChart();
+        }
+
+        // 미리보기 차트 업데이트
+        function updatePreviewChart() {
+            console.log('updatePreviewChart 호출됨');
+            
+            try {
+                // 현재 설정값들 가져오기
+                const chartType = document.querySelector('input[name="chartType"]:checked')?.value || 'line';
+                const showLegend = document.getElementById('showLegend')?.checked || false;
+                const showMaxValue = document.getElementById('showMaxValue')?.checked || false;
+                const comparePrevious = document.getElementById('comparePrevious')?.checked || false;
+                const yAxisMax = document.querySelector('input[name="yAxisMax"]:checked')?.value || 'auto';
+                const yAxisMaxValue = document.getElementById('yAxisMaxValue')?.value || '100';
+                
+                // 임계치 설정 가져오기
+                const showMaxThreshold = document.getElementById('showMaxThreshold')?.checked || false;
+                const maxThresholdValue = document.getElementById('maxThresholdValue')?.value || '90';
+                const showAverageLine = document.getElementById('showAverageLine')?.checked || false;
+                const showMinThreshold = document.getElementById('showMinThreshold')?.checked || false;
+                const minThresholdValue = document.getElementById('minThresholdValue')?.value || '10';
+
+                console.log('설정값들:', { 
+                    chartType, showLegend, showMaxValue, comparePrevious, yAxisMax, yAxisMaxValue,
+                    showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue
+                });
+
+                // 미리보기 영역 업데이트
+                const container = document.querySelector('.preview-chart-container');
+                console.log('미리보기 컨테이너:', container);
+                if (container) {
+                    // 샘플 데이터
+                    const data1 = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65];
+                    const data2 = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
+                    const labels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+                    
+                    // SVG 차트 생성
+                    const svgWidth = 400;
+                    const svgHeight = 150;
+                    const padding = 20;
+                    const chartWidth = svgWidth - padding * 2;
+                    const chartHeight = svgHeight - padding * 2;
+                    
+                    let svgContent = '';
+                    
+                    if (chartType === 'line') {
+                        // 선차트
+                        svgContent = createLineChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue);
+                    } else if (chartType === 'bar') {
+                        // 막대차트
+                        svgContent = createBarChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue);
+                    } else if (chartType === 'area') {
+                        // 영역차트
+                        svgContent = createAreaChart(data1, data2, labels, svgWidth, svgHeight, padding, chartWidth, chartHeight, comparePrevious, yAxisMax, yAxisMaxValue, showMaxThreshold, maxThresholdValue, showAverageLine, showMinThreshold, minThresholdValue);
+                    }
+                    
+                    // 범례 추가
+                    if (showLegend) {
+                        svgContent += createLegend(svgWidth, svgHeight);
+                    }
+                    
+                    container.innerHTML = `
+                        <div style="width: 100%; height: 150px; background: white; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden;">
+                            <svg width="100%" height="100%" viewBox="0 0 ${svgWidth} ${svgHeight}" style="display: block;">
+                                ${svgContent}
+                            </svg>
+                        </div>
+                    `;
+                }
+
+                // 토글 텍스트 업데이트
+                const compareText = document.getElementById('compareText');
+                const maxValueText = document.getElementById('maxValueText');
+                const legendText = document.getElementById('legendText');
+                
+                if (compareText) compareText.textContent = comparePrevious ? 'ON' : 'OFF';
+                if (maxValueText) maxValueText.textContent = showMaxValue ? 'ON' : 'OFF';
+                if (legendText) legendText.textContent = showLegend ? 'ON' : 'OFF';
+
+                console.log('미리보기 업데이트 완료');
+                
+            } catch (error) {
+                console.error('미리보기 차트 업데이트 오류:', error);
+            }
+        }
+
+        // Y축 고정 토글
+        function toggleYAxisFixed() {
+            const yAxisFixedInput = document.getElementById('yAxisFixedInput');
+            const fixedRadio = document.querySelector('input[name="yAxisMax"][value="fixed"]');
+            
+            if (fixedRadio.checked) {
+                yAxisFixedInput.style.display = 'block';
+            } else {
+                yAxisFixedInput.style.display = 'none';
+            }
+            updatePreviewChart();
+        }
+
+        // 차트 설정 적용
+        function applyChartSettings() {
+            console.log('🚀🚀🚀🚀🚀🚀🚀 applyChartSettings 함수 시작 🚀🚀🚀🚀🚀🚀🚀');
+            
+            // 즉시 모달 닫기 (가장 먼저)
+            const modal = document.getElementById('chartSettingsModal');
+            if (modal) {
+                console.log('🚀 즉시 모달 닫기 시작');
+                modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.style.opacity = '0';
+                modal.style.zIndex = '-1';
+                modal.classList.remove('show');
+                console.log('🚀 즉시 모달 닫기 완료');
+            }
+            
+            const chartId = window.currentChartSettingsId;
+            console.log('🚀 현재 차트 ID:', chartId);
+            
+            // 차트 설정 적용 시도
+            try {
+                if (!chartId) {
+                    console.log('차트 ID가 없습니다.');
+                    showNotification('차트 ID가 없습니다.');
+                    return;
+                }
+
+                // 실제 차트에 설정 적용
+                const chartElement = document.getElementById(`chart-${chartId}`);
+                const chart = chartElement ? chartElement.chart : null;
+                console.log('차트 요소:', chartElement);
+                console.log('차트 인스턴스:', chart);
+                
+                if (chart) {
+                    const chartType = document.querySelector('input[name="chartType"]:checked')?.value || 'line';
+                    const showLegend = document.getElementById('showLegend')?.checked || false;
+                    const yAxisMax = document.querySelector('input[name="yAxisMax"]:checked')?.value || 'auto';
+                    const yAxisMaxValue = document.getElementById('yAxisMaxValue')?.value || '100';
+                    
+                    console.log('🚀 적용할 설정들:');
+                    console.log('- 차트 타입:', chartType);
+                    console.log('- 범례 표시:', showLegend);
+                    console.log('- Y축 최대값:', yAxisMax);
+                    console.log('- Y축 고정값:', yAxisMaxValue);
+
+                    // 범례 표시/숨김
+                    if (chart.options && chart.options.plugins) {
+                        chart.options.plugins.legend.display = showLegend;
+                        console.log('🚀 범례 설정 적용됨:', showLegend);
+                    }
+                    
+                    // Y축 최대값 설정
+                    if (chart.options && chart.options.scales && chart.options.scales.y) {
+                        if (yAxisMax === 'fixed' && yAxisMaxValue) {
+                            chart.options.scales.y.max = parseInt(yAxisMaxValue);
+                            chart.options.scales.y.min = 0;
+                            console.log('🚀 Y축 고정값 설정됨:', parseInt(yAxisMaxValue));
+                        } else {
+                            chart.options.scales.y.max = undefined;
+                            chart.options.scales.y.min = undefined;
+                            console.log('🚀 Y축 자동값 설정됨');
+                        }
+                    }
+
+
+                    // 차트 업데이트
+                    console.log('🚀 차트 업데이트 시작...');
+                    chart.update('active');
+                    console.log('🚀 차트 업데이트 완료');
+                } else {
+                    console.log('차트 인스턴스를 찾을 수 없습니다.');
+                    showNotification('차트를 찾을 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('차트 설정 적용 중 오류:', error);
+                showNotification('차트 설정 적용 중 오류가 발생했습니다.');
+            }
+            
+            console.log('알림 표시 전...');
+            showNotification('차트 설정이 적용되었습니다.');
+            console.log('차트 설정 적용 완료');
+        }
+        
+        // 전역 함수로도 등록 (추가 보장)
+        window.applyChartSettings = applyChartSettings;
+        console.log('전역 applyChartSettings 함수 등록 완료');
 
         // 조회설정 모달 열기
         function openQuerySettings(chartId) {
@@ -8453,8 +9766,8 @@
             showNotification('변경사항이 초기화되었습니다.');
         }
 
-        // 차트 설정 적용
-        function applyChartSettings(chartId) {
+        // 차트 설정 적용 (기존 함수)
+        function applyChartSettingsOld(chartId) {
             const config = chartConfigs[chartId];
             if (!config) return;
             
@@ -9778,5 +11091,89 @@
             }, 1000);
         });
     </script>
+
+    <!-- 기간조회 모달 -->
+    <div id="periodQueryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>기간 조회 설정</h3>
+                <button class="close-btn" onclick="closePeriodQueryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 전체 설정을 따름 체크박스 -->
+                <div class="global-settings-section">
+                    <label class="global-checkbox-label">
+                        <input type="checkbox" id="followGlobalSettings" onchange="toggleIndividualPeriod()">
+                        <span class="global-checkmark"></span>
+                        전체 설정을 따름
+                    </label>
+                </div>
+                
+                <!-- 개별 설정 영역 -->
+                <div id="individualPeriodSettings" class="individual-period-settings">
+                    <div class="query-panel">
+                        <div class="realtime-mode" id="modalRealtimeMode" style="display: none;">
+                            <button class="query-btn stop-btn" onclick="stopRealtime()" title="실시간 모니터링 중지">
+                                <i class="fas fa-stop"></i>
+                                정지
+                            </button>
+                            <div class="realtime-status">
+                                <div class="status-indicator">
+                                    <div class="pulse-circle"></div>
+                                </div>
+                                <span>실시간 감시중</span>
+                            </div>
+                            <select class="refresh-interval" id="modalRefreshInterval" onchange="changeRefreshInterval(this.value)">
+                                <option value="5m" selected>실시간 5분</option>
+                                <option value="10m">실시간 10분</option>
+                                <option value="1h">실시간 1시간</option>
+                            </select>
+                        </div>
+                        
+                        <div class="query-mode" id="modalQueryMode">
+                            <button class="query-btn start-btn" onclick="startRealtime()" title="실시간 모니터링 시작">
+                                <i class="fas fa-play"></i>
+                                실시간
+                            </button>
+                            <div class="datetime-inputs">
+                                <input type="datetime-local" class="datetime-input" id="modalStartDateTime">
+                                <span class="range-separator">~</span>
+                                <input type="datetime-local" class="datetime-input" id="modalEndDateTime">
+                            </div>
+                            <select class="duration-badge" id="modalDurationBadge" onchange="changeDuration(this.value)">
+                                <option value="5m">최근 5분</option>
+                                <option value="10m">최근 10분</option>
+                                <option value="1h" selected>최근 1시간</option>
+                                <option value="3h">최근 3시간</option>
+                                <option value="6h">최근 6시간</option>
+                                <option value="12h">최근 12시간</option>
+                                <option value="1d">최근 1일</option>
+                                <option value="3d">최근 3일</option>
+                                <option value="7d">최근 7일</option>
+                                <option value="30d">최근 30일</option>
+                                <option value="custom">사용자 정의</option>
+                            </select>
+                            <span class="interval-label">간격</span>
+                            <select class="interval-select" id="modalTimeInterval" onchange="setupIntervalListener()">
+                                <option value="1m">1분</option>
+                                <option value="5m">5분</option>
+                                <option value="10m">10분</option>
+                                <option value="30m">30분</option>
+                                <option value="1h">1시간</option>
+                            </select>
+                            <button class="query-btn execute-btn" onclick="executeQuery()" title="조회 실행">
+                                <i class="fas fa-search"></i>
+                                조회
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePeriodQueryModal()">취소</button>
+                <button class="btn btn-primary" onclick="applyPeriodQuery()">적용</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
