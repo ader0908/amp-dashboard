@@ -937,10 +937,9 @@
 
         .options-grid {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 0.3rem;
-            align-items: center;
-            overflow-x: auto;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: flex-start;
             padding: 0.2rem 0;
         }
 
@@ -949,14 +948,13 @@
             flex-direction: row;
             gap: 0.3rem;
             align-items: center;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 4px;
             padding: 0.3rem 0.5rem;
-            margin-bottom: 0;
-            flex-shrink: 0;
-            min-width: fit-content;
+            margin-bottom: 0.5rem;
+            width: 100%;
         }
 
         .option-label {
@@ -980,7 +978,7 @@
 
         .checkbox-group {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             gap: 0.3rem;
             align-items: center;
         }
@@ -1112,6 +1110,22 @@
 
         .chart-card:hover {
             box-shadow: var(--shadow-md);
+            border: 2px solid #3b82f6;
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        .chart-card:active {
+            transform: translateY(0px) scale(0.98);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid #1d4ed8;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .chart-card.selected {
+            border: 2px solid #1d4ed8;
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         }
 
         .edit-mode .chart-card {
@@ -1126,10 +1140,18 @@
         }
 
         .edit-mode .chart-card.dragging {
-            opacity: 0.7;
-            transform: rotate(1deg);
+            opacity: 0.9;
+            transform: rotate(2deg) scale(1.05);
             z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            width: auto !important;
+            height: auto !important;
+            min-width: 280px;
+            min-height: 200px;
+            max-width: 800px;
+            max-height: 600px;
         }
+
 
         /* 리사이즈 핸들 */
         .resize-handles {
@@ -1162,7 +1184,12 @@
         }
 
         .edit-mode .resize-handle {
-            opacity: 0.9;
+            opacity: 0.8;
+        }
+
+        .edit-mode .chart-card.selected .resize-handle {
+            opacity: 1;
+            background: #1d4ed8;
         }
 
         .resize-handle:hover {
@@ -1229,6 +1256,7 @@
             min-height: 200px;
             max-width: 800px;
             max-height: 600px;
+            resize: none; /* 기본 리사이즈 비활성화 */
         }
 
         /* 차트 헤더 */
@@ -5628,7 +5656,25 @@
                 { id: 'stt-usage', name: 'STT 사용량 통계', type: 'stt', icon: 'fas fa-chart-bar', unit: '%', max: 100,
                   metrics: ['usage', 'modelA', 'modelB'], category: 'service' },
                 { id: 'stt-epd', name: 'STT EPD 시간 통계', type: 'stt', icon: 'fas fa-clock', unit: 'ms', max: 5000,
-                  metrics: ['avgEpd', 'maxEpd', 'minEpd'], category: 'service' }
+                  metrics: ['avgEpd', 'maxEpd', 'minEpd'], category: 'service' },
+                { id: 'stt-latency', name: 'STT 응답 지연시간', type: 'stt', icon: 'fas fa-stopwatch', unit: 'ms', max: 2000,
+                  metrics: ['latency', 'avgLatency', 'maxLatency'], category: 'service' },
+                { id: 'stt-throughput', name: 'STT 처리량', type: 'stt', icon: 'fas fa-tachometer-alt', unit: 'req/s', max: 1000,
+                  metrics: ['throughput', 'maxThroughput', 'avgThroughput'], category: 'service' },
+                { id: 'stt-accuracy', name: 'STT 정확도', type: 'stt', icon: 'fas fa-bullseye', unit: '%', max: 100,
+                  metrics: ['accuracy', 'wordAccuracy', 'sentenceAccuracy'], category: 'service' },
+                { id: 'stt-concurrent', name: 'STT 동시 처리', type: 'stt', icon: 'fas fa-users', unit: '명', max: 100,
+                  metrics: ['concurrent', 'maxConcurrent', 'avgConcurrent'], category: 'service' },
+                { id: 'stt-queue', name: 'STT 대기열', type: 'stt', icon: 'fas fa-list-ol', unit: '건', max: 500,
+                  metrics: ['queueLength', 'avgQueue', 'maxQueue'], category: 'service' },
+                { id: 'stt-error', name: 'STT 오류율', type: 'stt', icon: 'fas fa-exclamation-circle', unit: '%', max: 10,
+                  metrics: ['errorRate', 'timeoutRate', 'rejectRate'], category: 'service' },
+                { id: 'stt-resource', name: 'STT 리소스 사용률', type: 'stt', icon: 'fas fa-cogs', unit: '%', max: 100,
+                  metrics: ['resourceUsage', 'cpuUsage', 'memoryUsage'], category: 'service' },
+                { id: 'stt-quality', name: 'STT 품질 점수', type: 'stt', icon: 'fas fa-star', unit: '점', max: 10,
+                  metrics: ['qualityScore', 'avgQuality', 'minQuality'], category: 'service' },
+                { id: 'stt-session', name: 'STT 세션 관리', type: 'stt', icon: 'fas fa-link', unit: '개', max: 1000,
+                  metrics: ['activeSessions', 'maxSessions', 'avgSessions'], category: 'service' }
             ],
             tts: [
                 // TTS 엔진 하드웨어 리소스
@@ -5705,15 +5751,20 @@
             Object.keys(engineCharts).forEach(engine => {
                 console.log(`🔧 ${engine} 엔진 초기화:`, engineCharts[engine].length, '개 차트');
                 cardVisibility[engine] = {};
-                engineCharts[engine].forEach(chart => {
-                    // 새 대시보드는 기본적으로 모든 차트를 숨김 (빈 화면)
-                    cardVisibility[engine][chart.id] = false;
-                    console.log(`  ❌ ${chart.id}: 숨김 설정 (빈 화면)`);
+                engineCharts[engine].forEach((chart, index) => {
+                    // 수정 모드 테스트를 위해 첫 번째 차트만 표시
+                    if (index === 0) {
+                        cardVisibility[engine][chart.id] = true;
+                        console.log(`  ✅ ${chart.id}: 표시 설정 (테스트용)`);
+                    } else {
+                        cardVisibility[engine][chart.id] = false;
+                        console.log(`  ❌ ${chart.id}: 숨김 설정`);
+                    }
                 });
             });
             
             console.log('📊 최종 cardVisibility:', cardVisibility);
-            console.log('✅ 카드 표시 상태 초기화 완료 (빈 화면)');
+            console.log('✅ 카드 표시 상태 초기화 완료 (테스트용)');
         }
 
         // 옵션 패널 생성
@@ -8512,7 +8563,17 @@
                     { id: 'stt-008', name: 'o-pod-008', status: 'success', selected: false },
                     { id: 'stt-009', name: 'o-pod-009', status: 'success', selected: false },
                     { id: 'stt-010', name: 'o-pod-010', status: 'success', selected: false },
-                    { id: 'stt-011', name: 'o-pod-011', status: 'success', selected: false }
+                    { id: 'stt-011', name: 'o-pod-011', status: 'success', selected: false },
+                    { id: 'stt-012', name: 'o-pod-012', status: 'success', selected: false },
+                    { id: 'stt-013', name: 'o-pod-013', status: 'success', selected: false },
+                    { id: 'stt-014', name: 'o-pod-014', status: 'success', selected: false },
+                    { id: 'stt-015', name: 'o-pod-015', status: 'success', selected: false },
+                    { id: 'stt-016', name: 'o-pod-016', status: 'success', selected: false },
+                    { id: 'stt-017', name: 'o-pod-017', status: 'success', selected: false },
+                    { id: 'stt-018', name: 'o-pod-018', status: 'success', selected: false },
+                    { id: 'stt-019', name: 'o-pod-019', status: 'success', selected: false },
+                    { id: 'stt-020', name: 'o-pod-020', status: 'success', selected: false },
+                    { id: 'stt-021', name: 'o-pod-021', status: 'success', selected: false }
                 ],
                 tts: [
                     { id: 'tts-013', name: 'o-pod-013', status: 'success', selected: true },
@@ -10083,63 +10144,70 @@
 
         // 드래그 앤 드롭 활성화
         function enableDragAndDrop() {
-            console.log('드래그 앤 드롭 활성화 시작');
+            console.log('🔧 드래그 앤 드롭 활성화 시작');
             
             const cards = document.querySelectorAll('.chart-card');
             const grid = document.getElementById('chartsGrid');
             
-            console.log('찾은 카드 수:', cards.length);
-            console.log('그리드 요소:', grid);
+            console.log('📊 찾은 카드 수:', cards.length);
+            console.log('📋 그리드 요소:', grid);
+            console.log('🎯 현재 모드:', currentMode);
             
             if (cards.length === 0) {
-                console.log('차트카드가 없습니다. 잠시 후 다시 시도합니다.');
+                console.log('❌ 차트카드가 없습니다. 잠시 후 다시 시도합니다.');
                 setTimeout(() => enableDragAndDrop(), 500);
                 return;
             }
             
+            // 기존 드래그 핸들 모두 제거
+            document.querySelectorAll('.drag-handle').forEach(handle => handle.remove());
+            
             // 드래그 앤 드롭 설정
             cards.forEach((card, index) => {
+                console.log(`🎨 카드 ${index} (${card.id}) 드래그 설정 시작`);
                 card.style.cursor = 'move';
                 card.style.userSelect = 'none';
-                console.log(`카드 ${index} (${card.id}) 드래그 설정`);
                 
-                // 드래그 핸들 추가 (카드 중앙에만)
-                const dragHandle = document.createElement('div');
-                dragHandle.className = 'drag-handle';
-                dragHandle.style.cssText = `
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    z-index: 1;
-                    cursor: move;
-                    background: transparent;
-                `;
-                
-                // 기존 드래그 핸들 제거
+                // 드래그 핸들 제거 (카드 전체 드래그로 대체)
                 const existingHandle = card.querySelector('.drag-handle');
                 if (existingHandle) {
                     existingHandle.remove();
                 }
+                console.log(`✅ 드래그 핸들 제거 완료: ${card.id}`);
                 
-                card.appendChild(dragHandle);
-                
-                // 드래그 핸들에만 이벤트 추가
-                dragHandle.addEventListener('mousedown', function(e) {
-                    console.log('드래그 시작:', card.id);
+                // 카드 전체에 드래그 이벤트 추가 (버튼 제외)
+                card.addEventListener('mousedown', function(e) {
+                    // 버튼이나 입력 요소를 클릭한 경우 드래그하지 않음
+                    if (e.target.tagName === 'BUTTON' || 
+                        e.target.tagName === 'INPUT' || 
+                        e.target.tagName === 'SELECT' ||
+                        e.target.closest('button') ||
+                        e.target.closest('input') ||
+                        e.target.closest('select')) {
+                        return;
+                    }
+                    
+                    console.log('🖱️ 카드 드래그 시작:', card.id);
+                    console.log('📍 마우스 위치:', e.clientX, e.clientY);
                     
                     const startX = e.clientX;
                     const startY = e.clientY;
                     const startRect = card.getBoundingClientRect();
                     
+                    // 카드 선택 효과
+                    card.classList.add('selected');
+                    
                     card.style.position = 'fixed';
                     card.style.zIndex = '1000';
                     card.style.pointerEvents = 'none';
-                    card.style.transform = 'rotate(2deg)';
-                    card.style.opacity = '0.8';
+                    card.style.transform = 'rotate(2deg) scale(1.05)';
+                    card.style.opacity = '0.9';
                     card.style.left = startRect.left + 'px';
                     card.style.top = startRect.top + 'px';
+                    card.style.width = startRect.width + 'px';
+                    card.style.height = startRect.height + 'px';
+                    card.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
+                    card.classList.add('dragging');
                     
                     function handleMouseMove(e) {
                         card.style.left = (startRect.left + e.clientX - startX) + 'px';
@@ -10176,6 +10244,11 @@
                         card.style.opacity = '';
                         card.style.left = '';
                         card.style.top = '';
+                        card.style.width = '';
+                        card.style.height = '';
+                        card.style.boxShadow = '';
+                        card.classList.remove('dragging');
+                        card.classList.remove('selected');
                         
                         document.removeEventListener('mousemove', handleMouseMove);
                         document.removeEventListener('mouseup', handleMouseUp);
@@ -10923,10 +10996,12 @@
         // 모드 전환 시 뷰모드 액션 버튼 표시/숨김
         function updateViewModeActions() {
             const viewModeActions = document.getElementById('viewModeActions');
-            if (currentMode === 'view') {
-                viewModeActions.classList.remove('hidden');
-            } else {
-                viewModeActions.classList.add('hidden');
+            if (viewModeActions) {
+                if (currentMode === 'view') {
+                    viewModeActions.classList.remove('hidden');
+                } else {
+                    viewModeActions.classList.add('hidden');
+                }
             }
         }
 
@@ -10970,7 +11045,7 @@
             
             // 드래그 앤 드롭 활성화 (지연 실행)
             setTimeout(() => {
-                console.log('드래그 앤 드롭 활성화 시도');
+                console.log('⏰ 드래그 앤 드롭 활성화 시도 (100ms 후)');
                 enableDragAndDrop();
             }, 100);
             
